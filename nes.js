@@ -1,9 +1,3 @@
-import { CPU } from './cpu.js';
-import { PPU } from './ppu.js';
-import { APU } from './apu.js';
-import { Memory } from './memory.js';
-import { Input } from './input.js';
-
 export class NESEmulator {
     constructor() {
         this.nes = null;
