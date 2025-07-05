@@ -75,11 +75,10 @@ class Logger {
 export class NES {
     constructor() {
         this.logger = new Logger();
-        this.nes = new window.jsnes.NES({
+        this.nes = new jsnes.NES({
             onFrame: this.onFrame.bind(this),
             onAudioSample: this.onAudioSample.bind(this),
-            onStatusUpdate: this.onStatusUpdate.bind(this),
-            onBatteryRamWrite: this.onBatteryRamWrite.bind(this)
+            onStatusUpdate: this.onStatusUpdate.bind(this)
         });
         
         this.canvas = document.getElementById('nesCanvas');
@@ -89,7 +88,6 @@ export class NES {
         this.running = false;
         this.romLoaded = false;
         this.frameCount = 0;
-        this.lastTime = 0;
         this.fps = 0;
         this.fpsCounter = 0;
         this.lastFpsTime = 0;
@@ -100,10 +98,9 @@ export class NES {
         
         this.initializeUI();
         this.initializeAudio();
-        this.gameLoop = this.gameLoop.bind(this);
         
         this.logger.info('NES Emulator initialized', {
-            jsnesVersion: window.jsnes.version || 'unknown',
+            jsnesVersion: jsnes.version || 'unknown',
             canvasSize: `${this.canvas.width}x${this.canvas.height}`
         });
     }
@@ -171,15 +168,15 @@ export class NES {
         this.logger.info('Initializing keyboard controls');
         
         const keyMap = {
-            'ArrowUp': [1, window.jsnes.Controller.BUTTON_UP],
-            'ArrowDown': [1, window.jsnes.Controller.BUTTON_DOWN],
-            'ArrowLeft': [1, window.jsnes.Controller.BUTTON_LEFT],
-            'ArrowRight': [1, window.jsnes.Controller.BUTTON_RIGHT],
-            'KeyX': [1, window.jsnes.Controller.BUTTON_A],
-            'KeyZ': [1, window.jsnes.Controller.BUTTON_B],
-            'Enter': [1, window.jsnes.Controller.BUTTON_START],
-            'ShiftLeft': [1, window.jsnes.Controller.BUTTON_SELECT],
-            'ShiftRight': [1, window.jsnes.Controller.BUTTON_SELECT]
+            'ArrowUp': [1, jsnes.Controller.BUTTON_UP],
+            'ArrowDown': [1, jsnes.Controller.BUTTON_DOWN],
+            'ArrowLeft': [1, jsnes.Controller.BUTTON_LEFT],
+            'ArrowRight': [1, jsnes.Controller.BUTTON_RIGHT],
+            'KeyX': [1, jsnes.Controller.BUTTON_A],
+            'KeyZ': [1, jsnes.Controller.BUTTON_B],
+            'Enter': [1, jsnes.Controller.BUTTON_START],
+            'ShiftLeft': [1, jsnes.Controller.BUTTON_SELECT],
+            'ShiftRight': [1, jsnes.Controller.BUTTON_SELECT]
         };
         
         document.addEventListener('keydown', (e) => {
@@ -225,11 +222,8 @@ export class NES {
                 header: Array.from(romData.slice(0, 16)).map(b => b.toString(16).padStart(2, '0')).join(' ')
             });
             
-            // Convert ROM data to string format that JSNES expects
-            const romString = Array.from(romData).map(byte => String.fromCharCode(byte)).join('');
-            
-            // Load ROM into JSNES
-            this.nes.loadROM(romString);
+            // Load ROM into JSNES using Uint8Array directly
+            this.nes.loadROM(romData);
             
             this.romLoaded = true;
             this.updateROMInfo(file.name, romData);
@@ -291,15 +285,25 @@ export class NES {
         this.logger.info('Starting emulation');
         this.running = true;
         document.getElementById('playPause').textContent = 'Pause';
-        this.lastTime = performance.now();
-        this.lastFpsTime = this.lastTime;
-        requestAnimationFrame(this.gameLoop);
+        this.lastFpsTime = performance.now();
+        
+        // Start FPS counter
+        this.startFpsCounter();
+        
+        // Start JSNES emulation
+        this.nes.start();
     }
     
     pause() {
         this.logger.info('Pausing emulation');
         this.running = false;
         document.getElementById('playPause').textContent = 'Play';
+        
+        // Stop JSNES emulation
+        this.nes.stop();
+        
+        // Stop FPS counter
+        this.stopFpsCounter();
     }
     
     reset() {
@@ -309,7 +313,23 @@ export class NES {
         this.fpsCounter = 0;
         
         if (this.running) {
-            this.play();
+            this.nes.start();
+        }
+    }
+    
+    startFpsCounter() {
+        this.fpsInterval = setInterval(() => {
+            this.fps = this.fpsCounter;
+            this.fpsCounter = 0;
+            this.logger.debug('FPS update', { fps: this.fps });
+            this.updateDebugInfo();
+        }, 1000);
+    }
+    
+    stopFpsCounter() {
+        if (this.fpsInterval) {
+            clearInterval(this.fpsInterval);
+            this.fpsInterval = null;
         }
     }
     
@@ -349,13 +369,15 @@ export class NES {
         for (let i = 0; i < frameBuffer.length; i++) {
             const pixel = frameBuffer[i];
             const index = i * 4;
-            this.imageData.data[index] = pixel & 0xFF;           // R
+            this.imageData.data[index] = (pixel >> 16) & 0xFF;     // R
             this.imageData.data[index + 1] = (pixel >> 8) & 0xFF;  // G
-            this.imageData.data[index + 2] = (pixel >> 16) & 0xFF; // B
-            this.imageData.data[index + 3] = 0xFF;                  // A
+            this.imageData.data[index + 2] = pixel & 0xFF;         // B
+            this.imageData.data[index + 3] = 0xFF;                 // A
         }
         
         this.ctx.putImageData(this.imageData, 0, 0);
+        this.frameCount++;
+        this.fpsCounter++;
     }
     
     onAudioSample(left, right) {
@@ -392,9 +414,6 @@ export class NES {
     updateDebugInfo() {
         const debugInfo = document.getElementById('debugInfo');
         if (debugInfo && this.romLoaded) {
-            const cpu = this.nes.cpu;
-            const ppu = this.nes.ppu;
-            
             debugInfo.innerHTML = `
                 <div class="debug-section">
                     <h4>Performance</h4>
@@ -403,23 +422,9 @@ export class NES {
                     Running: ${this.running ? 'Yes' : 'No'}
                 </div>
                 <div class="debug-section">
-                    <h4>CPU State</h4>
-                    ${cpu ? `
-                        PC: $${(cpu.REG_PC || 0).toString(16).toUpperCase().padStart(4, '0')}<br>
-                        A: $${(cpu.REG_ACC || 0).toString(16).toUpperCase().padStart(2, '0')}<br>
-                        X: $${(cpu.REG_X || 0).toString(16).toUpperCase().padStart(2, '0')}<br>
-                        Y: $${(cpu.REG_Y || 0).toString(16).toUpperCase().padStart(2, '0')}<br>
-                        SP: $${(cpu.REG_SP || 0).toString(16).toUpperCase().padStart(2, '0')}<br>
-                        P: $${(cpu.REG_P || 0).toString(16).toUpperCase().padStart(2, '0')}
-                    ` : 'CPU state not available'}
-                </div>
-                <div class="debug-section">
-                    <h4>PPU State</h4>
-                    ${ppu ? `
-                        Scanline: ${ppu.scanline || 0}<br>
-                        Cycle: ${ppu.curX || 0}<br>
-                        VBlank: ${ppu.vblankFlag ? 'Yes' : 'No'}
-                    ` : 'PPU state not available'}
+                    <h4>Emulator State</h4>
+                    ROM Loaded: ${this.romLoaded ? 'Yes' : 'No'}<br>
+                    Audio Context: ${this.audioContext ? this.audioContext.state : 'None'}
                 </div>
             `;
         }
