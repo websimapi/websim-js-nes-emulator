@@ -15,6 +15,7 @@
                 <button id="playPause">Play</button>
                 <button id="reset">Reset</button>
                 <button id="fullscreen">Fullscreen</button>
+                <button id="toggleLogs">Toggle Logs</button>
             </div>
         </header>
         
@@ -24,36 +25,50 @@
                 <div class="loading" id="loading">Select a ROM file to start</div>
             </div>
             
-            <div class="game-info">
-                <div class="rom-info">
-                    <h3>ROM Information</h3>
-                    <div id="romDetails">No ROM loaded</div>
-                </div>
-                
-                <div class="controls-info">
-                    <h3>Controls</h3>
-                    <div class="control-mapping">
-                        <div class="control-row">
-                            <span class="key">Arrow Keys</span>
-                            <span class="action">D-Pad</span>
-                        </div>
-                        <div class="control-row">
-                            <span class="key">X</span>
-                            <span class="action">A Button</span>
-                        </div>
-                        <div class="control-row">
-                            <span class="key">Z</span>
-                            <span class="action">B Button</span>
-                        </div>
-                        <div class="control-row">
-                            <span class="key">Enter</span>
-                            <span class="action">Start</span>
-                        </div>
-                        <div class="control-row">
-                            <span class="key">Shift</span>
-                            <span class="action">Select</span>
+            <div class="side-panel">
+                <div class="game-info">
+                    <div class="rom-info">
+                        <h3>ROM Information</h3>
+                        <div id="romDetails">No ROM loaded</div>
+                    </div>
+                    
+                    <div class="controls-info">
+                        <h3>Controls</h3>
+                        <div class="control-mapping">
+                            <div class="control-row">
+                                <span class="key">Arrow Keys</span>
+                                <span class="action">D-Pad</span>
+                            </div>
+                            <div class="control-row">
+                                <span class="key">X</span>
+                                <span class="action">A Button</span>
+                            </div>
+                            <div class="control-row">
+                                <span class="key">Z</span>
+                                <span class="action">B Button</span>
+                            </div>
+                            <div class="control-row">
+                                <span class="key">Enter</span>
+                                <span class="action">Start</span>
+                            </div>
+                            <div class="control-row">
+                                <span class="key">Shift</span>
+                                <span class="action">Select</span>
+                            </div>
                         </div>
                     </div>
+                </div>
+                
+                <div class="verbose-logs" id="verboseLogs">
+                    <h3>Verbose Logs</h3>
+                    <div class="log-controls">
+                        <button id="clearLogs">Clear</button>
+                        <button id="pauseLogs">Pause</button>
+                        <label>
+                            <input type="checkbox" id="autoScroll" checked> Auto-scroll
+                        </label>
+                    </div>
+                    <div class="log-output" id="logOutput"></div>
                 </div>
             </div>
         </main>
@@ -64,8 +79,8 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/jsnes@1.2.1/dist/jsnes.min.js"></script>
     <script type="module" src="nes.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
-
