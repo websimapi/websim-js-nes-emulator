@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS NES Emulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>JS NES Emulator</h1>
+            <div class="controls">
+                <input type="file" id="romFile" accept=".nes" />
+                <button id="playPause">Play</button>
+                <button id="reset">Reset</button>
+                <button id="fullscreen">Fullscreen</button>
+            </div>
+        </header>
+        
+        <main>
+            <div class="emulator-screen">
+                <canvas id="nesCanvas" width="256" height="240"></canvas>
+                <div class="loading" id="loading">Select a ROM file to start</div>
+            </div>
+            
+            <div class="game-info">
+                <div class="rom-info">
+                    <h3>ROM Information</h3>
+                    <div id="romDetails">No ROM loaded</div>
+                </div>
+                
+                <div class="controls-info">
+                    <h3>Controls</h3>
+                    <div class="control-mapping">
+                        <div class="control-row">
+                            <span class="key">Arrow Keys</span>
+                            <span class="action">D-Pad</span>
+                        </div>
+                        <div class="control-row">
+                            <span class="key">X</span>
+                            <span class="action">A Button</span>
+                        </div>
+                        <div class="control-row">
+                            <span class="key">Z</span>
+                            <span class="action">B Button</span>
+                        </div>
+                        <div class="control-row">
+                            <span class="key">Enter</span>
+                            <span class="action">Start</span>
+                        </div>
+                        <div class="control-row">
+                            <span class="key">Shift</span>
+                            <span class="action">Select</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div class="debug-panel" id="debugPanel">
+            <h3>Debug Info</h3>
+            <div id="debugInfo"></div>
+        </div>
+    </div>
+
+    <script type="module" src="nes.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
