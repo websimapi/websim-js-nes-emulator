@@ -404,18 +404,22 @@ export class NES {
                 </div>
                 <div class="debug-section">
                     <h4>CPU State</h4>
-                    PC: $${cpu.REG_PC.toString(16).toUpperCase().padStart(4, '0')}<br>
-                    A: $${cpu.REG_ACC.toString(16).toUpperCase().padStart(2, '0')}<br>
-                    X: $${cpu.REG_X.toString(16).toUpperCase().padStart(2, '0')}<br>
-                    Y: $${cpu.REG_Y.toString(16).toUpperCase().padStart(2, '0')}<br>
-                    SP: $${cpu.REG_SP.toString(16).toUpperCase().padStart(2, '0')}<br>
-                    P: $${cpu.REG_P.toString(16).toUpperCase().padStart(2, '0')}
+                    ${cpu ? `
+                        PC: $${(cpu.REG_PC || 0).toString(16).toUpperCase().padStart(4, '0')}<br>
+                        A: $${(cpu.REG_ACC || 0).toString(16).toUpperCase().padStart(2, '0')}<br>
+                        X: $${(cpu.REG_X || 0).toString(16).toUpperCase().padStart(2, '0')}<br>
+                        Y: $${(cpu.REG_Y || 0).toString(16).toUpperCase().padStart(2, '0')}<br>
+                        SP: $${(cpu.REG_SP || 0).toString(16).toUpperCase().padStart(2, '0')}<br>
+                        P: $${(cpu.REG_P || 0).toString(16).toUpperCase().padStart(2, '0')}
+                    ` : 'CPU state not available'}
                 </div>
                 <div class="debug-section">
                     <h4>PPU State</h4>
-                    Scanline: ${ppu.scanline}<br>
-                    Cycle: ${ppu.curX}<br>
-                    VBlank: ${ppu.vblankFlag ? 'Yes' : 'No'}
+                    ${ppu ? `
+                        Scanline: ${ppu.scanline || 0}<br>
+                        Cycle: ${ppu.curX || 0}<br>
+                        VBlank: ${ppu.vblankFlag ? 'Yes' : 'No'}
+                    ` : 'PPU state not available'}
                 </div>
             `;
         }
