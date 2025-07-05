@@ -75,7 +75,7 @@ class Logger {
 export class NES {
     constructor() {
         this.logger = new Logger();
-        this.nes = new jsnes.NES({
+        this.nes = new window.jsnes.NES({
             onFrame: this.onFrame.bind(this),
             onAudioSample: this.onAudioSample.bind(this),
             onStatusUpdate: this.onStatusUpdate.bind(this)
@@ -100,7 +100,7 @@ export class NES {
         this.initializeAudio();
         
         this.logger.info('NES Emulator initialized', {
-            jsnesVersion: jsnes.version || 'unknown',
+            jsnesVersion: window.jsnes.version || 'unknown',
             canvasSize: `${this.canvas.width}x${this.canvas.height}`
         });
     }
@@ -168,15 +168,15 @@ export class NES {
         this.logger.info('Initializing keyboard controls');
         
         const keyMap = {
-            'ArrowUp': [1, jsnes.Controller.BUTTON_UP],
-            'ArrowDown': [1, jsnes.Controller.BUTTON_DOWN],
-            'ArrowLeft': [1, jsnes.Controller.BUTTON_LEFT],
-            'ArrowRight': [1, jsnes.Controller.BUTTON_RIGHT],
-            'KeyX': [1, jsnes.Controller.BUTTON_A],
-            'KeyZ': [1, jsnes.Controller.BUTTON_B],
-            'Enter': [1, jsnes.Controller.BUTTON_START],
-            'ShiftLeft': [1, jsnes.Controller.BUTTON_SELECT],
-            'ShiftRight': [1, jsnes.Controller.BUTTON_SELECT]
+            'ArrowUp': [1, window.jsnes.Controller.BUTTON_UP],
+            'ArrowDown': [1, window.jsnes.Controller.BUTTON_DOWN],
+            'ArrowLeft': [1, window.jsnes.Controller.BUTTON_LEFT],
+            'ArrowRight': [1, window.jsnes.Controller.BUTTON_RIGHT],
+            'KeyX': [1, window.jsnes.Controller.BUTTON_A],
+            'KeyZ': [1, window.jsnes.Controller.BUTTON_B],
+            'Enter': [1, window.jsnes.Controller.BUTTON_START],
+            'ShiftLeft': [1, window.jsnes.Controller.BUTTON_SELECT],
+            'ShiftRight': [1, window.jsnes.Controller.BUTTON_SELECT]
         };
         
         document.addEventListener('keydown', (e) => {
@@ -443,5 +443,5 @@ export class NES {
 
 // Initialize NES emulator when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    window.nes = new NES();
+    window.nesEmulator = new NES();
 });
