@@ -225,8 +225,11 @@ export class NES {
                 header: Array.from(romData.slice(0, 16)).map(b => b.toString(16).padStart(2, '0')).join(' ')
             });
             
+            // Convert ROM data to string format that JSNES expects
+            const romString = Array.from(romData).map(byte => String.fromCharCode(byte)).join('');
+            
             // Load ROM into JSNES
-            this.nes.loadROM(romData);
+            this.nes.loadROM(romString);
             
             this.romLoaded = true;
             this.updateROMInfo(file.name, romData);
